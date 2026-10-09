@@ -32,7 +32,7 @@
     text('route-detail', selected ? selected.detail : (outsideRange ? 'هذه الواجهة مخصصة للإصدارات المدرجة من 9.00 إلى 13.52 فقط. لن يبدأ التشغيل على هذا الإصدار.' : 'لا يوجد رابط تشغيل مُعد لهذا الإصدار، حتى لو كان ضمن النطاق. راجع رقم النظام؛ لا تختَر إصدارًا مختلفًا عنه.'));
     el('launch').disabled = !isPS4 || !selected || !firmware || launching;
     text('launch-label', !isPS4 ? 'افتح من متصفح PS4 للتشغيل' : (!selected ? 'الإصدار غير مدرج' : (launching ? 'جارٍ فتح ملفات التشغيل…' : 'تشغيل GoldHEN')));
-    text('launch-caption', selected ? 'التشغيل داخل موقع مكتب اليسر، ويبقى الرابط على نفس النطاق.' : 'لن تبدأ طريقة غير مطابقة للإصدار.');
+    text('launch-caption', selected ? 'التشغيل داخل هذه الواجهة بدون الانتقال إلى صفحة ثانية.' : 'لن تبدأ طريقة غير مطابقة للإصدار.');
   }
   el('preview-firmware').addEventListener('change', function () { preview = this.value; render(); });
   el('launch').addEventListener('click', function () {
@@ -43,9 +43,14 @@
     launching = true;
     render();
     text('action-message','جارٍ فتح ملفات التشغيل داخل موقع مكتب اليسر…');
-    window.location.assign(target.url);
+    document.body.className += ' running';
+    el('runner').hidden = false;
+    var frame = el('runner-frame');
+    frame.src = target.url;
+    frame.focus();
+    text('action-message','تابع نتيجة التشغيل بالنافذة أدناه. فتح النافذة لا يعني نجاح التفعيل.');
   });
-  window.addEventListener('pageshow',function () { launching = false; text('action-message',''); render(); });
+  window.addEventListener('pageshow',function () { if (!launching) { text('action-message',''); render(); } });
   document.addEventListener('keydown', function (event) {
     var key = event.keyCode || event.which;
     if (key !== 38 && key !== 40) return;
